@@ -1,5 +1,6 @@
 package cc.szulc.flightapp.controller;
 
+import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import cc.szulc.flightapp.service.FlightSearchService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,7 @@ public class FlightController {
     }
 
     @GetMapping
-    public String findFlights(){
+    public FlightOfferResponseDto findFlights(){
         return flightSearchService.searchForFlights();
     }
 

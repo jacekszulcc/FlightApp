@@ -1,15 +1,14 @@
 package cc.szulc.flightapp.service;
 
+import cc.szulc.flightapp.dto.FlightOfferResponseDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.SocketOption;
-import java.sql.SQLOutput;
 import java.util.Map;
 
 
@@ -17,6 +16,8 @@ import java.util.Map;
 public class FlightSearchService {
 
     private RestTemplate restTemplate;
+    private String cachedToken;
+    private long tokenExpirationTime;
 
     @Value("${amadeus.api.url}")
     private String apiUrl;
@@ -32,6 +33,12 @@ public class FlightSearchService {
     }
 
     private String getAccessToken() {
+        if (cachedToken != null && System.currentTimeMillis() < tokenExpirationTime) {
+            System.out.println("Używam zapisanego tokena.");
+            return cachedToken;
+        }
+
+        System.out.println("Brak ważnego tokena, pobieram nowy.");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -44,39 +51,27 @@ public class FlightSearchService {
 
         ResponseEntity<Map> response = restTemplate.postForEntity(authUrl, requestEntity, Map.class);
 
-        String accessToken = (String) response.getBody().get("access_token");
-        System.out.println("Pobrano nowy Access Token: " + accessToken);
-        return accessToken;
+        String newAccessToken = (String) response.getBody().get("access_token");
+        Integer expiresIn = (Integer) response.getBody().get("expires_in");
+
+        this.cachedToken = newAccessToken;
+        this.tokenExpirationTime = System.currentTimeMillis() + (expiresIn * 1000);
+
+        System.out.println("Pobrano i zapisano nowy token.");
+        return newAccessToken;
     }
 
-    public String searchForFlights() {
-        /* String accessToken = getAccessToken();
+    public FlightOfferResponseDto searchForFlights() {
+        System.out.println("Używam zasymulowanej odpowiedzi API.");
+        String jsonResponse = getMockedFlightData();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ObjectMapper objectMapper = new ObjectMapper();;
 
-        String urlWithParams = UriComponentsBuilder.fromUriString(apiUrl)
-                .queryParam("originLocationCode", "MAD")
-                .queryParam("destinationLocationCode", "JFK")
-                .queryParam("departureDate", "2025-11-25")
-                .queryParam("adults", 1)
-                .encode()
-                .toUriString();
-
-        System.out.println("FINALNY URL: " + urlWithParams);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                urlWithParams,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-
-        return response.getBody(); */
-        System.out.println("Używam zasymulowanej odpowiedzi API, aby kontynuować pracę.");
-        return getMockedFlightData();
-
+        try {
+            return objectMapper.readValue(jsonResponse, FlightOfferResponseDto.class);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private String getMockedFlightData() {
