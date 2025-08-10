@@ -8,6 +8,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
@@ -61,14 +62,30 @@ public class FlightSearchService {
         return newAccessToken;
     }
 
-    public FlightOfferResponseDto searchForFlights() {
-        System.out.println("Używam zasymulowanej odpowiedzi API.");
-        String jsonResponse = getMockedFlightData();
+    public FlightOfferResponseDto searchForFlights(String originLocationCode, String destinationLocationCode, String departureDate, int adults) {
+        String accessToken = getAccessToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        String urlWithParms = UriComponentsBuilder.fromUriString(apiUrl)
+                .queryParam("originLocationCode", originLocationCode)
+                .queryParam("destinationLocationCode", destinationLocationCode)
+                .queryParam("departureDate", departureDate)
+                .queryParam("adults", adults)
+                .encode()
+                .toUriString();
+
+        System.out.println("URL: " + urlWithParms);
+
+        ResponseEntity<String> response = restTemplate.exchange(urlWithParms, HttpMethod.GET, entity, String.class);
 
         ObjectMapper objectMapper = new ObjectMapper();;
 
         try {
-            return objectMapper.readValue(jsonResponse, FlightOfferResponseDto.class);
+            String jsonBody= response.getBody();
+            return objectMapper.readValue(jsonBody, FlightOfferResponseDto.class);
         } catch (Exception e) {
             return null;
         }
