@@ -33,7 +33,7 @@ public class FlightSearchService {
         this.restTemplate = restTemplate;
     }
 
-    private String getAccessToken() {
+    String getAccessToken() {
         if (cachedToken != null && System.currentTimeMillis() < tokenExpirationTime) {
             System.out.println("Używam zapisanego tokena.");
             return cachedToken;
