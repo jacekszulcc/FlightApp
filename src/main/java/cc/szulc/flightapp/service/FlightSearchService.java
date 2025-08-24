@@ -3,6 +3,7 @@ package cc.szulc.flightapp.service;
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -62,7 +63,9 @@ public class FlightSearchService {
         return newAccessToken;
     }
 
+    @Cacheable("flightOffers")
     public FlightOfferResponseDto searchForFlights(String originLocationCode, String destinationLocationCode, String departureDate, int adults) {
+        System.out.println("--- WYKONUJĘ PRAWDZIWE WYSZUKIWANIE ---");
         String accessToken = getAccessToken();
 
         HttpHeaders headers = new HttpHeaders();
