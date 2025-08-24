@@ -2,6 +2,7 @@ package cc.szulc.flightapp.controller;
 
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import cc.szulc.flightapp.service.FlightSearchService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +24,7 @@ public class FlightController {
         @RequestParam("destinationLocationCode") String destination,
         @RequestParam("departureDate") String date,
         @RequestParam("adults") int adults
-    ){
+    )  throws JsonProcessingException {
         return flightSearchService.searchForFlights(origin, destination, date, adults);
     }
 }

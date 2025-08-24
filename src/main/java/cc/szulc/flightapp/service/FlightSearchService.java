@@ -1,6 +1,7 @@
 package cc.szulc.flightapp.service;
 
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class FlightSearchService {
 
     private RestTemplate restTemplate;
+    private ObjectMapper objectMapper;
     private String cachedToken;
     private long tokenExpirationTime;
 
@@ -30,8 +32,9 @@ public class FlightSearchService {
     @Value("${amadeus.api.clientSecret}")
     private String apiClientSecret;
 
-    public FlightSearchService(RestTemplate restTemplate) {
+    public FlightSearchService(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
     String getAccessToken() {
@@ -64,7 +67,7 @@ public class FlightSearchService {
     }
 
     @Cacheable("flightOffers")
-    public FlightOfferResponseDto searchForFlights(String originLocationCode, String destinationLocationCode, String departureDate, int adults) {
+    public FlightOfferResponseDto searchForFlights(String originLocationCode, String destinationLocationCode, String departureDate, int adults) throws JsonProcessingException {
         System.out.println("--- WYKONUJĘ PRAWDZIWE WYSZUKIWANIE ---");
         String accessToken = getAccessToken();
 
@@ -82,16 +85,15 @@ public class FlightSearchService {
 
         System.out.println("URL: " + urlWithParms);
 
-        ResponseEntity<String> response = restTemplate.exchange(urlWithParms, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(
+                urlWithParms,
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
 
-        ObjectMapper objectMapper = new ObjectMapper();;
-
-        try {
-            String jsonBody= response.getBody();
-            return objectMapper.readValue(jsonBody, FlightOfferResponseDto.class);
-        } catch (Exception e) {
-            return null;
-        }
+        String jsonBody= response.getBody();
+        return objectMapper.readValue(jsonBody, FlightOfferResponseDto.class);
     }
 
     private String getMockedFlightData() {

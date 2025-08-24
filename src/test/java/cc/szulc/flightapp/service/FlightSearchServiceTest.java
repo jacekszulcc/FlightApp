@@ -2,8 +2,11 @@ package cc.szulc.flightapp.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
@@ -11,10 +14,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class FlightSearchServiceTest {
 
     @Mock
@@ -38,7 +41,11 @@ class FlightSearchServiceTest {
         );
         ResponseEntity<Map> testResponseEntity = ResponseEntity.ok(testResponse);
 
-        when(restTemplate.postForEntity(any(), any(), eq(Map.class))).thenReturn(testResponseEntity);
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(HttpEntity.class),
+                eq(Map.class)
+        )).thenReturn(testResponseEntity);
 
         String accessToken = flightSearchService.getAccessToken();
 
