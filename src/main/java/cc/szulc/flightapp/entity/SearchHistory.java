@@ -16,6 +16,7 @@ public class SearchHistory {
     private Long id;
     private String originLocationCode;
     private String destinationLocationCode;
+    private String departureDate;
     private int adults;
     private LocalDateTime searchTimestamp;
 }

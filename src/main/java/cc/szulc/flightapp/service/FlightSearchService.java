@@ -1,6 +1,8 @@
 package cc.szulc.flightapp.service;
 
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
+import cc.szulc.flightapp.entity.SearchHistory;
+import cc.szulc.flightapp.repository.SearchHistoryRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 
@@ -21,6 +24,7 @@ public class FlightSearchService {
     private RestTemplate restTemplate;
     private ObjectMapper objectMapper;
     private String cachedToken;
+    private final SearchHistoryRepository searchHistoryRepository;
     private long tokenExpirationTime;
 
     @Value("${amadeus.api.url}")
@@ -32,9 +36,10 @@ public class FlightSearchService {
     @Value("${amadeus.api.clientSecret}")
     private String apiClientSecret;
 
-    public FlightSearchService(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public FlightSearchService(RestTemplate restTemplate, ObjectMapper objectMapper, SearchHistoryRepository searchHistoryRepository) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.searchHistoryRepository = searchHistoryRepository;
     }
 
     String getAccessToken() {
@@ -93,6 +98,16 @@ public class FlightSearchService {
         );
 
         String jsonBody= response.getBody();
+
+        System.out.println("Zapisywanie wyszukiwania do bazy danych...");
+        SearchHistory historyEntry = new SearchHistory();
+        historyEntry.setOriginLocationCode(originLocationCode);
+        historyEntry.setDestinationLocationCode(destinationLocationCode);
+        historyEntry.setDepartureDate(departureDate);
+        historyEntry.setAdults(adults);
+        historyEntry.setSearchTimestamp(LocalDateTime.now());
+        searchHistoryRepository.save(historyEntry);
+
         return objectMapper.readValue(jsonBody, FlightOfferResponseDto.class);
     }
 
