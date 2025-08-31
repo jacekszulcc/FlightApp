@@ -1,6 +1,7 @@
 package cc.szulc.flightapp.controller;
 
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
+import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.service.FlightSearchService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/flights")
+@RequestMapping("/api")
 public class FlightController {
 
     private final FlightSearchService flightSearchService;
@@ -26,5 +29,10 @@ public class FlightController {
         @RequestParam("adults") int adults
     )  throws JsonProcessingException {
         return flightSearchService.searchForFlights(origin, destination, date, adults);
+    }
+
+    @GetMapping("/history")
+    public List<SearchHistory> getHistory(){
+        return flightSearchService.getSearchHistory();
     }
 }

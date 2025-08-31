@@ -15,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 
@@ -109,6 +110,11 @@ public class FlightSearchService {
         searchHistoryRepository.save(historyEntry);
 
         return objectMapper.readValue(jsonBody, FlightOfferResponseDto.class);
+    }
+
+    public List<SearchHistory> getSearchHistory(){
+        System.out.println("Pobieranie historii wyszukiwań z bazy danych...");
+        return searchHistoryRepository.findAll();
     }
 
     private String getMockedFlightData() {
