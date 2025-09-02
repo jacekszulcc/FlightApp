@@ -24,6 +24,8 @@ Głównym celem projektu było zademonstrowanie kluczowych umiejętności wymaga
     * Spring Cache
     * Maven
     * Lombok
+    * Spring Cache
+    * Caffeine
 * **Testowanie:**
     * JUnit 5
     * Mockito
@@ -49,13 +51,8 @@ Najprostszym sposobem na uruchomienie aplikacji jest użycie Dockera.
     ```
 
 2.  **Stwórz plik `application.properties`:**
-    W katalogu `src/main/resources/` stwórz plik `application.properties` i uzupełnij go swoimi kluczami z [Amadeus for Developers](https://developers.amadeus.com/).
-    ```properties
-    amadeus.api.url=[https://test.api.amadeus.com/v2/shopping/flight-offers](https://test.api.amadeus.com/v2/shopping/flight-offers)
-    amadeus.api.authUrl=[https://test.api.amadeus.com/v1/security/oauth2/token](https://test.api.amadeus.com/v1/security/oauth2/token)
-    amadeus.api.clientId=TWOJ_CLIENT_ID
-    amadeus.api.clientSecret=TWOJ_CLIENT_SECRET
-    ```
+    Stwórz plik application.properties:
+    W katalogu src/main/resources/ skopiuj plik application.properties.example do nowego pliku o nazwie application.properties. Następnie uzupełnij go swoimi kluczami z Amadeus for Developers.
 
 3.  **Zbuduj obraz Dockera:**
     W głównym katalogu projektu uruchom komendę:
