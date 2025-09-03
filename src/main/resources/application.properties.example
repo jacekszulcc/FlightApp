@@ -19,3 +19,5 @@ spring.jpa.hibernate.ddl-auto=update
 
 spring.cache.type=caffeine
 spring.cache.caffeine.spec=expireAfterWrite=10m
+spring.jackson.deserialization.fail-on-unknown-properties=false
+spring.jackson.serialization.write-dates-as-timestamps=false

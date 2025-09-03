@@ -1,12 +1,16 @@
 package cc.szulc.flightapp.service;
 
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
+import cc.szulc.flightapp.dto.SearchHistoryDto;
 import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.repository.SearchHistoryRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -15,15 +19,14 @@ import org.springframework.http.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 
 @Service
 public class FlightSearchService {
 
-    private RestTemplate restTemplate;
-    private ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     private String cachedToken;
     private final SearchHistoryRepository searchHistoryRepository;
     private long tokenExpirationTime;
@@ -74,31 +77,40 @@ public class FlightSearchService {
 
     @Cacheable("flightOffers")
     public FlightOfferResponseDto searchForFlights(String originLocationCode, String destinationLocationCode, String departureDate, int adults) throws JsonProcessingException {
-        System.out.println("--- WYKONUJĘ PRAWDZIWE WYSZUKIWANIE ---");
-        String accessToken = getAccessToken();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        final boolean useMockData = true;
 
-        String urlWithParms = UriComponentsBuilder.fromUriString(apiUrl)
-                .queryParam("originLocationCode", originLocationCode)
-                .queryParam("destinationLocationCode", destinationLocationCode)
-                .queryParam("departureDate", departureDate)
-                .queryParam("adults", adults)
-                .encode()
-                .toUriString();
+        String jsonBody;
 
-        System.out.println("URL: " + urlWithParms);
+        if (useMockData) {
+            System.out.println("...UWAGA: Używam zasymulowanych danych (mock)!...");
+            jsonBody = getMockedFlightData();
+        } else {
+            System.out.println("...WYKONUJĘ PRAWDZIWE WYSZUKIWANIE (LIVE)...");
+            String accessToken = getAccessToken();
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                urlWithParms,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        String jsonBody= response.getBody();
+            String urlWithParams = UriComponentsBuilder.fromUriString(apiUrl)
+                    .queryParam("originLocationCode", originLocationCode)
+                    .queryParam("destinationLocationCode", destinationLocationCode)
+                    .queryParam("departureDate", departureDate)
+                    .queryParam("adults", adults)
+                    .encode()
+                    .toUriString();
+
+            System.out.println("URL: " + urlWithParams);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    urlWithParams,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+            jsonBody = response.getBody();
+        }
 
         System.out.println("Zapisywanie wyszukiwania do bazy danych...");
         SearchHistory historyEntry = new SearchHistory();
@@ -112,9 +124,22 @@ public class FlightSearchService {
         return objectMapper.readValue(jsonBody, FlightOfferResponseDto.class);
     }
 
-    public List<SearchHistory> getSearchHistory(){
-        System.out.println("Pobieranie historii wyszukiwań z bazy danych...");
-        return searchHistoryRepository.findAll();
+    public Page<SearchHistory> getSearchHistory(int page, int size) {
+        System.out.println("Pobieranie historii wyszukiwańskich z bazy danych...");
+
+        Pageable pageable = PageRequest.of(page, size);
+        return searchHistoryRepository.findAll(pageable);
+    }
+
+    public SearchHistoryDto mapToDto(SearchHistory entity) {
+        SearchHistoryDto dto = new SearchHistoryDto();
+        dto.setId(entity.getId());
+        dto.setOriginLocationCode(entity.getOriginLocationCode());
+        dto.setDestinationLocationCode(entity.getDestinationLocationCode());
+        dto.setDepartureDate(entity.getDepartureDate());
+        dto.setAdults(entity.getAdults());
+        dto.setSearchTimestamp(entity.getSearchTimestamp());
+        return dto;
     }
 
     private String getMockedFlightData() {
