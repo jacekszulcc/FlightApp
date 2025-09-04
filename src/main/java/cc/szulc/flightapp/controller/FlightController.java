@@ -5,7 +5,12 @@ import cc.szulc.flightapp.dto.SearchHistoryDto;
 import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.service.FlightSearchService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@Validated
 public class FlightController {
 
     private final FlightSearchService flightSearchService;
@@ -23,12 +29,12 @@ public class FlightController {
 
     @GetMapping("/flights")
     public FlightOfferResponseDto findFlights(
-        @RequestParam("originLocationCode") String origin,
-        @RequestParam("destinationLocationCode") String destination,
-        @RequestParam("departureDate") String date,
-        @RequestParam("adults") int adults
-    )  throws JsonProcessingException {
-        return flightSearchService.searchForFlights(origin, destination, date, adults);
+            @RequestParam @NotBlank @Size(min = 3, max = 3) String originLocationCode,
+            @RequestParam @NotBlank @Size(min = 3, max = 3) String destinationLocationCode,
+            @RequestParam @NotBlank String departureDate, // W przyszłości dodamy tu walidację formatu daty
+            @RequestParam @NotNull @Positive int adults
+    ) throws JsonProcessingException {
+        return flightSearchService.searchForFlights(originLocationCode, destinationLocationCode, departureDate, adults);
     }
 
     @GetMapping("/history")
