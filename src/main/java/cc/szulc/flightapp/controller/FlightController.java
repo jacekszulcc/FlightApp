@@ -43,7 +43,17 @@ public class FlightController {
             @RequestParam(defaultValue = "20") int size
     ){
         Page<SearchHistory> historyPage = flightSearchService.getSearchHistory(page, size);
-        return historyPage.map(flightSearchService::mapToDto);
+        return historyPage.map(this::mapToDto);
     }
 
+    private SearchHistoryDto mapToDto(SearchHistory entity) {
+        SearchHistoryDto dto = new SearchHistoryDto();
+        dto.setId(entity.getId());
+        dto.setOriginLocationCode(entity.getOriginLocationCode());
+        dto.setDestinationLocationCode(entity.getDestinationLocationCode());
+        dto.setDepartureDate(entity.getDepartureDate());
+        dto.setAdults(entity.getAdults());
+        dto.setSearchTimestamp(entity.getSearchTimestamp());
+        return dto;
+    }
 }
