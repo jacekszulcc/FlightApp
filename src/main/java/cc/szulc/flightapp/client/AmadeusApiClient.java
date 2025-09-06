@@ -3,6 +3,7 @@ package cc.szulc.flightapp.client;
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class AmadeusApiClient {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;

@@ -31,7 +31,7 @@ public class FlightController {
     public FlightOfferResponseDto findFlights(
             @RequestParam @NotBlank @Size(min = 3, max = 3) String originLocationCode,
             @RequestParam @NotBlank @Size(min = 3, max = 3) String destinationLocationCode,
-            @RequestParam @NotBlank String departureDate, // W przyszłości dodamy tu walidację formatu daty
+            @RequestParam @NotBlank String departureDate,
             @RequestParam @NotNull @Positive int adults
     ) throws JsonProcessingException {
         return flightSearchService.searchForFlights(originLocationCode, destinationLocationCode, departureDate, adults);

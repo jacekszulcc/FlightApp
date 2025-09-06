@@ -5,6 +5,7 @@ import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.repository.SearchHistoryRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
+@Slf4j
 public class FlightSearchService {
 
     private final SearchHistoryRepository searchHistoryRepository;
@@ -40,7 +42,7 @@ public class FlightSearchService {
     }
 
     public Page<SearchHistory> getSearchHistory(int page, int size) {
-        System.out.println("Pobieranie historii wyszukiwań z bazy danych - strona: " + page + ", rozmiar: " + size);
+        log.info("Pobieranie historii wyszukiwań z bazy danych - strona: {}, rozmiar: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
         return searchHistoryRepository.findAll(pageable);
     }
