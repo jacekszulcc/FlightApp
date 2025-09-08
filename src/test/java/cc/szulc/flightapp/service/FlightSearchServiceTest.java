@@ -1,54 +1,49 @@
 package cc.szulc.flightapp.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import cc.szulc.flightapp.client.AmadeusApiClient;
+import cc.szulc.flightapp.dto.FlightOfferResponseDto;
+import cc.szulc.flightapp.entity.SearchHistory;
+import cc.szulc.flightapp.repository.SearchHistoryRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FlightSearchServiceTest {
 
     @Mock
-    private RestTemplate restTemplate;
+    private AmadeusApiClient amadeusApiClient;
+
+    @Mock
+    private SearchHistoryRepository searchHistoryRepository;
 
     @InjectMocks
     private FlightSearchService flightSearchService;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(flightSearchService, "authUrl", "http://test-url.com");
-        ReflectionTestUtils.setField(flightSearchService, "apiClientId", "test-id");
-        ReflectionTestUtils.setField(flightSearchService, "apiClientSecret", "test-secret");
-    }
-
     @Test
-    void shouldReturnAccessTokenWhenApiCallIsSuccessful() {
-        Map<String, Object> testResponse = Map.of(
-                "access_token", "test-token-123",
-                "expires_in", 1799
-        );
-        ResponseEntity<Map> testResponseEntity = ResponseEntity.ok(testResponse);
+    void searchForFlights_shouldCallApiClientAndSaveToHistory() throws JsonProcessingException {
+        String origin = "WAW";
+        String destination = "BER";
+        String date = "2025-10-10";
+        int adults = 1;
 
-        when(restTemplate.postForEntity(
-                anyString(),
-                any(HttpEntity.class),
-                eq(Map.class)
-        )).thenReturn(testResponseEntity);
+        FlightOfferResponseDto mockResponse = new FlightOfferResponseDto();
 
-        String accessToken = flightSearchService.getAccessToken();
+        when(amadeusApiClient.fetchFlightOffers(origin, destination, date, adults)).thenReturn(mockResponse);
 
-        assertThat(accessToken).isEqualTo("test-token-123");
+        FlightOfferResponseDto actualResponse = flightSearchService.searchForFlights(origin, destination, date, adults);
+
+        verify(amadeusApiClient, times(1)).fetchFlightOffers(origin, destination, date, adults);
+
+        verify(searchHistoryRepository, times(1)).save(any(SearchHistory.class));
+
+        assertThat(actualResponse).isSameAs(mockResponse);
     }
 }

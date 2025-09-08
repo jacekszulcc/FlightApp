@@ -1,5 +1,6 @@
 package cc.szulc.flightapp.controller;
 
+import cc.szulc.flightapp.dto.RestPage;
 import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.repository.SearchHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,16 +47,21 @@ public class SearchHistoryIntegrationTest {
         searchHistoryRepository.save(testEntry);
 
         String url = "http://localhost:" + port + "/api/history";
-        ResponseEntity<List<SearchHistory>> response = restTemplate.exchange(
+
+        ParameterizedTypeReference<RestPage<SearchHistory>> responseType = new ParameterizedTypeReference<>() {};
+
+        ResponseEntity<RestPage<SearchHistory>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {}
+                responseType
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
 
-        List<SearchHistory> historyList = response.getBody();
+        List<SearchHistory> historyList = response.getBody().getContent();
+
         assertThat(historyList).hasSize(1);
         assertThat(historyList.get(0).getOriginLocationCode()).isEqualTo("WAW");
         assertThat(historyList.get(0).getDestinationLocationCode()).isEqualTo("JFK");
