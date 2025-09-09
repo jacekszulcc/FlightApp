@@ -1,0 +1,25 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: flightapp-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=flightuser
+      - POSTGRES_PASSWORD=flightpassword
+      - POSTGRES_DB=flightapp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  flight-app:
+    build: .
+    container_name: flightapp-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+
+volumes:
+  postgres-data:
