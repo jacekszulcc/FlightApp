@@ -6,10 +6,13 @@ import cc.szulc.flightapp.repository.SearchHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,9 @@ public class SearchHistoryIntegrationTest {
     @Autowired
     private SearchHistoryRepository searchHistoryRepository;
 
+    @Value("${api.security.key}")
+    private String apiKey;
+
     @BeforeEach
     void cleanup() {
         searchHistoryRepository.deleteAll();
@@ -48,12 +54,16 @@ public class SearchHistoryIntegrationTest {
 
         String url = "http://localhost:" + port + "/api/history";
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-API-KEY", apiKey);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         ParameterizedTypeReference<RestPage<SearchHistory>> responseType = new ParameterizedTypeReference<>() {};
 
         ResponseEntity<RestPage<SearchHistory>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                null,
+                entity,
                 responseType
         );
 
