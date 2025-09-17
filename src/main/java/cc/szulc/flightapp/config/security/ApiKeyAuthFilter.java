@@ -7,12 +7,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class ApiKeyAuthFilter extends OncePerRequestFilter {
@@ -31,10 +32,12 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         String requestApiKey = request.getHeader(API_KEY_HEADER);
 
         if (correctApiKey.equals(requestApiKey)) {
+            var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     "api-user",
                     null,
-                    AuthorityUtils.NO_AUTHORITIES
+                    authorities
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
