@@ -19,6 +19,5 @@ public class SearchHistory {
     private String destinationLocationCode;
     private String departureDate;
     private int adults;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
     private LocalDateTime searchTimestamp;
 }
