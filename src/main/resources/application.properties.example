@@ -1,25 +1,25 @@
+# === KONFIGURACJA APLIKACJI ===
 spring.application.name=FlightApp
 
-# === KONFIGURACJA API AMADEUS ===
+# === KONFIGURACJA BAZY DANYCH POSTGRESQL (dla lokalnego developmentu) ===
+# Uwaga: Te wartości pasują do domyślnej konfiguracji w docker-compose.yml
+spring.datasource.url=jdbc:postgresql://localhost:5432/flightapp
+spring.datasource.username=flightuser
+spring.datasource.password=flightpassword
+spring.datasource.driverClassName=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+
+# === KONFIGURACJA API AMADEUS (wymaga uzupełnienia własnymi kluczami) ===
 amadeus.api.url=https://test.api.amadeus.com/v2/shopping/flight-offers
 amadeus.api.authUrl=https://test.api.amadeus.com/v1/security/oauth2/token
 amadeus.api.clientId=WPISZ_SWOJ_CLIENT_ID
 amadeus.api.clientSecret=WPISZ_SWOJ_CLIENT_SECRET
 
-# === KONFIGURACJA BAZY DANYCH H2 ===
-spring.h2.console.enabled=true
-spring.datasource.url=jdbc:h2:mem:flightdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=su
-spring.datasource.password=
+# === KONFIGURACJA ZABEZPIECZEŃ APLIKACJI ===
+api.security.key=WPISZ_TUTAJ_SWOJ_TAJNY_KLUCZ_API
 
-# ... (reszta konfiguracji pozostaje bez zmian)
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto=update
-
+# === KONFIGURACJA CACHE I INNE ===
 spring.cache.type=caffeine
 spring.cache.caffeine.spec=expireAfterWrite=10m
+spring.jpa.open-in-view=false
 spring.jackson.deserialization.fail-on-unknown-properties=false
-spring.jackson.serialization.write-dates-as-timestamps=false
-
-api.security.key=TwojSuperTajnyKlucz123
