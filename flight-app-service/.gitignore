@@ -1,6 +1,6 @@
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
+flight-app-service/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 -
@@ -32,7 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
-/src/main/resources/application.properties
+/flight-app-service/src/main/resources/application.properties
 
 # Ignore environment file with secrets
 .env
