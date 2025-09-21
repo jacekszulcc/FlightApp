@@ -5,47 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a914f797-4444-4426-b3ad-c48e24ef8b81" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/flight-app-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/.gitattributes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/build.yml" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/.github/workflows/build.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/mvnw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/mvnw.cmd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/FlightAppApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/FlightAppApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/client/AmadeusApiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/client/AmadeusApiClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/config/AppConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/config/security/ApiKeyAuthFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/config/security/ApiKeyAuthFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/config/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/config/security/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/controller/FlightController.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/controller/FlightController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/controller/HealthCheckController.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/controller/HealthCheckController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/AircraftDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/AircraftDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/DepartureArrivalDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/DepartureArrivalDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/ErrorResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/ErrorResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/FlightOfferDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/FlightOfferDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/FlightOfferResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/FlightOfferResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/ItineraryDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/ItineraryDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/PriceDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/PriceDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/RestPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/RestPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/SearchHistoryDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/SearchHistoryDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/dto/SegmentDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/SegmentDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/entity/SearchHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/entity/SearchHistory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/package-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/package-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/repository/SearchHistoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/repository/SearchHistoryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cc/szulc/flightapp/service/FlightSearchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/service/FlightSearchService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/resources/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties.example" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/resources/application.properties.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cc/szulc/flightapp/FlightAppApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/test/java/cc/szulc/flightapp/FlightAppApplicationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cc/szulc/flightapp/controller/FlightControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/test/java/cc/szulc/flightapp/controller/FlightControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cc/szulc/flightapp/controller/HealthCheckControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/test/java/cc/szulc/flightapp/controller/HealthCheckControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cc/szulc/flightapp/controller/SearchHistoryIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/test/java/cc/szulc/flightapp/controller/SearchHistoryIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cc/szulc/flightapp/service/FlightSearchServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/test/java/cc/szulc/flightapp/service/FlightSearchServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/test/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flight-app-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/RestPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/RestPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +83,7 @@
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.general",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
@@ -233,8 +196,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
-        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26199.169" />
       </set>
     </attachedChunks>
   </component>
@@ -265,5 +227,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

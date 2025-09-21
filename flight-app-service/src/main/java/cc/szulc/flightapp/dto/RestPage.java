@@ -1,13 +1,16 @@
 package cc.szulc.flightapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RestPage<T> extends PageImpl<T> {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -21,14 +24,18 @@ public class RestPage<T> extends PageImpl<T> {
                     @JsonProperty("sort") JsonNode sort,
                     @JsonProperty("first") boolean first,
                     @JsonProperty("numberOfElements") int numberOfElements) {
-        super(content, PageRequest.of(number, size), totalElements);
+        super(content, PageRequest.of(number, Math.max(1, size)), totalElements);
+    }
+
+    public RestPage(List<T> content) {
+        super(content);
     }
 
     public RestPage(List<T> content, Pageable pageable, long total) {
         super(content, pageable, total);
     }
 
-    public RestPage(List<T> content) {
-        super(content);
+    public RestPage(PageImpl<T> page) {
+        super(page.getContent(), page.getPageable(), page.getTotalElements());
     }
 }
