@@ -58,8 +58,8 @@
     </build>
 
     <modules>
-        <module>flight-app-service</module>
         <module>flight-app-db</module>
+        <module>flight-app-service</module>
     </modules>
 
 </project>
