@@ -5,9 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a914f797-4444-4426-b3ad-c48e24ef8b81" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flight-app-db/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-db/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flight-app-db/target/flight-app-db-0.0.1-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-db/target/flight-app-db-0.0.1-SNAPSHOT.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flight-app-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/RestPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/dto/RestPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/entity/SearchHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-db/src/main/java/cc/szulc/flightapp/entity/SearchHistory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/repository/SearchHistoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/flight-app-service/src/main/java/cc/szulc/flightapp/repository/SearchHistoryRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -68,6 +73,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.FlightAppApplication.executor": "Run",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
