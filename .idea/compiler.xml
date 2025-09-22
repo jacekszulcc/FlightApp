@@ -22,6 +22,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="FlightApp" options="-parameters" />
+      <module name="flight-app-db" options="-parameters" />
       <module name="flight-app-service" options="-parameters" />
     </option>
   </component>
