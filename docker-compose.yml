@@ -21,6 +21,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - API_SECURITY_KEY=${API_SECURITY_KEY}
+      - AMADEUS_API_CLIENTID=${AMADEUS_API_CLIENTID}
+      - AMADEUS_API_CLIENTSECRET=${AMADEUS_API_CLIENTSECRET}
 
 volumes:
   postgres-data:
