@@ -1,8 +1,12 @@
 package cc.szulc.flightapp.controller;
 
+import cc.szulc.flightapp.dto.CreateFavoriteFlightRequestDto;
+import cc.szulc.flightapp.dto.FavoriteFlightDto;
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import cc.szulc.flightapp.dto.SearchHistoryDto;
+import cc.szulc.flightapp.entity.FavoriteFlight;
 import cc.szulc.flightapp.entity.SearchHistory;
+import cc.szulc.flightapp.service.FavoriteFlightService;
 import cc.szulc.flightapp.service.FlightSearchService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.constraints.NotBlank;
@@ -10,11 +14,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -22,9 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class FlightController {
 
     private final FlightSearchService flightSearchService;
+    private final FavoriteFlightService favoriteFlightService;
 
-    public FlightController(FlightSearchService flightSearchService) {
+    public FlightController(FlightSearchService flightSearchService, FavoriteFlightService favoriteFlightService) {
         this.flightSearchService = flightSearchService;
+        this.favoriteFlightService = favoriteFlightService;
     }
 
     @GetMapping("/flights")
@@ -46,6 +53,27 @@ public class FlightController {
         return historyPage.map(this::mapToDto);
     }
 
+    @PostMapping("/favorites")
+    @ResponseStatus(HttpStatus.CREATED)
+    public FavoriteFlightDto addFavorite(@RequestBody CreateFavoriteFlightRequestDto request) {
+        FavoriteFlight favoriteFlight = mapToEntity(request);
+        FavoriteFlight savedFavorite = favoriteFlightService.addFavorite(favoriteFlight);
+        return mapToDto(savedFavorite);
+    }
+
+    @GetMapping("/favorites")
+    public List<FavoriteFlightDto> getFavorites() {
+        return favoriteFlightService.getAllFavorites().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @DeleteMapping("/favorites/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFavorite(@PathVariable Long id) {
+        favoriteFlightService.deleteFavorite(id);
+    }
+
     private SearchHistoryDto mapToDto(SearchHistory entity) {
         SearchHistoryDto dto = new SearchHistoryDto();
         dto.setId(entity.getId());
@@ -55,5 +83,29 @@ public class FlightController {
         dto.setAdults(entity.getAdults());
         dto.setSearchTimestamp(entity.getSearchTimestamp());
         return dto;
+    }
+
+    private FavoriteFlightDto mapToDto(FavoriteFlight entity) {
+        FavoriteFlightDto dto = new FavoriteFlightDto();
+        dto.setId(entity.getId());
+        dto.setOrigin(entity.getOrigin());
+        dto.setDestination(entity.getDestination());
+        dto.setDepartureDate(entity.getDepartureDate());
+        dto.setArrivalDate(entity.getArrivalDate());
+        dto.setCarrier(entity.getCarrier());
+        dto.setPrice(entity.getPrice());
+        dto.setAddedAt(entity.getAddedAt());
+        return dto;
+    }
+
+    private FavoriteFlight mapToEntity(CreateFavoriteFlightRequestDto dto) {
+        FavoriteFlight entity = new FavoriteFlight();
+        entity.setOrigin(dto.getOrigin());
+        entity.setDestination(dto.getDestination());
+        entity.setDepartureDate(dto.getDepartureDate());
+        entity.setArrivalDate(dto.getArrivalDate());
+        entity.setCarrier(dto.getCarrier());
+        entity.setPrice(dto.getPrice());
+        return entity;
     }
 }
