@@ -12,8 +12,18 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(AmadeusApiRequestException.class)
+    public ResponseEntity<ErrorResponseDto> handleAmadeusApiRequestException(AmadeusApiRequestException ex) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                LocalDateTime.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(), // Używamy statusu 503
+                "External Service Error",
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
+    }
 
-    // NOWA METODA do obsługi błędów walidacji
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex) {
         String message = ex.getConstraintViolations().stream()
