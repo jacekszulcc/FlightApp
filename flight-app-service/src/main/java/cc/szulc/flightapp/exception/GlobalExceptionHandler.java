@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    
+
     @ExceptionHandler(AmadeusApiRequestException.class)
     public ResponseEntity<ErrorResponseDto> handleAmadeusApiRequestException(AmadeusApiRequestException ex) {
         ErrorResponseDto errorResponse = new ErrorResponseDto(
