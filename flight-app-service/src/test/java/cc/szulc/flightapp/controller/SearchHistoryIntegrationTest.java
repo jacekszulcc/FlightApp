@@ -1,41 +1,30 @@
 package cc.szulc.flightapp.controller;
 
-import cc.szulc.flightapp.dto.RestPage;
 import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.repository.SearchHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class SearchHistoryIntegrationTest {
 
-    @LocalServerPort
-    private int port;
-
     @Autowired
-    private TestRestTemplate restTemplate;
+    private MockMvc mockMvc;
 
     @Autowired
     private SearchHistoryRepository searchHistoryRepository;
-
-    @Value("${api.security.key}")
-    private String apiKey;
 
     @BeforeEach
     void cleanup() {
@@ -43,7 +32,8 @@ public class SearchHistoryIntegrationTest {
     }
 
     @Test
-    void shouldReturnSavedSearchHistory() {
+    @WithMockUser
+    void shouldReturnSavedSearchHistory() throws Exception {
         SearchHistory testEntry = new SearchHistory();
         testEntry.setOriginLocationCode("WAW");
         testEntry.setDestinationLocationCode("JFK");
@@ -52,28 +42,9 @@ public class SearchHistoryIntegrationTest {
         testEntry.setSearchTimestamp(LocalDateTime.now());
         searchHistoryRepository.save(testEntry);
 
-        String url = "http://localhost:" + port + "/api/history";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-API-KEY", apiKey);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        ParameterizedTypeReference<RestPage<SearchHistory>> responseType = new ParameterizedTypeReference<>() {};
-
-        ResponseEntity<RestPage<SearchHistory>> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                responseType
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-
-        List<SearchHistory> historyList = response.getBody().getContent();
-
-        assertThat(historyList).hasSize(1);
-        assertThat(historyList.get(0).getOriginLocationCode()).isEqualTo("WAW");
-        assertThat(historyList.get(0).getDestinationLocationCode()).isEqualTo("JFK");
+        mockMvc.perform(get("/api/history"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].originLocationCode").value("WAW"));
     }
 }

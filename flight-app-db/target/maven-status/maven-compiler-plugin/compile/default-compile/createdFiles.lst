@@ -1,1 +1,3 @@
 cc/szulc/flightapp/entity/SearchHistory.class
+cc/szulc/flightapp/entity/User.class
+cc/szulc/flightapp/entity/FavoriteFlight.class

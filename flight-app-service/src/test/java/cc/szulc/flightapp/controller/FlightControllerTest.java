@@ -5,10 +5,10 @@ import cc.szulc.flightapp.service.FlightSearchService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -31,10 +31,8 @@ class FlightControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${api.security.key}")
-    private String apiKey;
-
     @Test
+    @WithMockUser
     void shouldReturnFlightWhenCorrectParametersAreProvided() throws Exception{
         FlightOfferResponseDto testResponse = new FlightOfferResponseDto();
 
@@ -45,8 +43,7 @@ class FlightControllerTest {
                         .param("originLocationCode", "MAD")
                         .param("destinationLocationCode", "JFK")
                         .param("departureDate", "2025-11-25")
-                        .param("adults", "1")
-                        .header("X-API-KEY", apiKey))
+                        .param("adults", "1"))
                 .andExpect(status().isOk())
                 .andReturn();
 
