@@ -3,14 +3,17 @@ package cc.szulc.flightapp.controller;
 import cc.szulc.flightapp.dto.AuthRequestDto;
 import cc.szulc.flightapp.dto.AuthResponseDto;
 import cc.szulc.flightapp.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Validated
 public class AuthController {
 
     private final AuthService authService;
@@ -22,7 +25,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerUser(@RequestBody AuthRequestDto authRequest) {
+    public void registerUser(@Valid @RequestBody AuthRequestDto authRequest) {
         authService.register(authRequest);
     }
 
