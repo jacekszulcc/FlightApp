@@ -18,9 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api")
 @Validated
@@ -53,6 +50,7 @@ public class FlightController {
         return historyPage.map(this::mapToDto);
     }
 
+
     @PostMapping("/favorites")
     @ResponseStatus(HttpStatus.CREATED)
     public FavoriteFlightDto addFavorite(@RequestBody CreateFavoriteFlightRequestDto request) {
@@ -62,10 +60,12 @@ public class FlightController {
     }
 
     @GetMapping("/favorites")
-    public List<FavoriteFlightDto> getFavorites() {
-        return favoriteFlightService.getAllFavorites().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<FavoriteFlightDto> getFavorites(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Page<FavoriteFlight> favoritesPage = favoriteFlightService.getAllFavorites(page, size);
+        return favoritesPage.map(this::mapToDto);
     }
 
     @DeleteMapping("/favorites/{id}")
