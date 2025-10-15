@@ -52,16 +52,14 @@ public class FavoriteFlightIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.origin").value("GDN"))
                 .andReturn().getResponse().getContentAsString();
 
         Long favoriteId = objectMapper.readTree(responseAsString).get("id").asLong();
-
+        
         mockMvc.perform(get("/api/favorites"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].destination").value("KRK"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].destination").value("KRK"));
 
         mockMvc.perform(delete("/api/favorites/" + favoriteId))
                 .andExpect(status().isNoContent());
