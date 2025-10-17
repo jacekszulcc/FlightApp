@@ -55,7 +55,7 @@ public class FavoriteFlightIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
         Long favoriteId = objectMapper.readTree(responseAsString).get("id").asLong();
-        
+
         mockMvc.perform(get("/api/favorites"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
