@@ -10,6 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,5 +50,29 @@ class FlightSearchServiceTest {
         verify(searchHistoryRepository, times(1)).save(any(SearchHistory.class));
 
         assertThat(actualResponse).isSameAs(mockResponse);
+    }
+
+    @Test
+    void getSearchHistory_shouldReturnPageOfHistory() {
+        // Given
+        int page = 0;
+        int size = 20;
+        Pageable expectedPageable = PageRequest.of(page, size);
+
+        SearchHistory historyEntry = new SearchHistory();
+        historyEntry.setId(1L);
+        historyEntry.setOriginLocationCode("WAW");
+
+        Page<SearchHistory> historyPage = new PageImpl<>(Collections.singletonList(historyEntry), expectedPageable, 1);
+
+        when(searchHistoryRepository.findAll(expectedPageable)).thenReturn(historyPage);
+        
+        Page<SearchHistory> result = flightSearchService.getSearchHistory(page, size);
+
+        verify(searchHistoryRepository, times(1)).findAll(expectedPageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).getOriginLocationCode()).isEqualTo("WAW");
     }
 }
