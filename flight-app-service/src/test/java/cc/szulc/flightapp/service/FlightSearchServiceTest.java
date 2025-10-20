@@ -54,7 +54,6 @@ class FlightSearchServiceTest {
 
     @Test
     void getSearchHistory_shouldReturnPageOfHistory() {
-        // Given
         int page = 0;
         int size = 20;
         Pageable expectedPageable = PageRequest.of(page, size);
@@ -66,7 +65,7 @@ class FlightSearchServiceTest {
         Page<SearchHistory> historyPage = new PageImpl<>(Collections.singletonList(historyEntry), expectedPageable, 1);
 
         when(searchHistoryRepository.findAll(expectedPageable)).thenReturn(historyPage);
-        
+
         Page<SearchHistory> result = flightSearchService.getSearchHistory(page, size);
 
         verify(searchHistoryRepository, times(1)).findAll(expectedPageable);
