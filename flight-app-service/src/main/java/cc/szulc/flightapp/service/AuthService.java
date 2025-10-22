@@ -2,6 +2,7 @@ package cc.szulc.flightapp.service;
 
 import cc.szulc.flightapp.dto.AuthRequestDto;
 import cc.szulc.flightapp.dto.AuthResponseDto;
+import cc.szulc.flightapp.entity.Role;
 import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.exception.UserAlreadyExistsException;
 import cc.szulc.flightapp.repository.UserRepository;
@@ -28,6 +29,7 @@ public class AuthService {
         User newUser = new User();
         newUser.setUsername(authRequest.getUsername());
         newUser.setPassword(passwordEncoder.encode(authRequest.getPassword()));
+        newUser.setRole(Role.ROLE_USER);
 
         userRepository.save(newUser);
     }
