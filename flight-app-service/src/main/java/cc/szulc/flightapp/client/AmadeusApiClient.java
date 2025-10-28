@@ -1,5 +1,6 @@
 package cc.szulc.flightapp.client;
 
+import cc.szulc.flightapp.dto.AirportLocationResponseDto;
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import cc.szulc.flightapp.exception.AmadeusApiRequestException; // Importujemy nasz nowy wyjątek
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestClientException; // Importujemy ogóln
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Component
@@ -28,6 +30,8 @@ public class AmadeusApiClient {
     private String apiUrl;
     @Value("${amadeus.api.authUrl}")
     private String authUrl;
+    @Value("${amadeus.api.locationsUrl}")
+    private String locationsApiUrl;
     @Value("${amadeus.api.clientId}")
     private String apiClientId;
     @Value("${amadeus.api.clientSecret}")
@@ -59,6 +63,31 @@ public class AmadeusApiClient {
         } catch (RestClientException e) {
             log.error("Error while fetching flight offers from Amadeus API", e);
             throw new AmadeusApiRequestException("Failed to fetch flight offers from Amadeus API.", e);
+        }
+    }
+
+    public AirportLocationResponseDto searchLocations(String keyword) throws JsonProcessingException {
+        try {
+            String accessToken = getAccessToken();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            String urlWithParams = UriComponentsBuilder.fromUriString(locationsApiUrl)
+                    .queryParam("subType", "AIRPORT,CITY")
+                    .queryParam("keyword", keyword)
+                    .encode()
+                    .toUriString();
+
+            ResponseEntity<String> response = restTemplate.exchange(urlWithParams, HttpMethod.GET, entity, String.class);
+            return objectMapper.readValue(response.getBody(), AirportLocationResponseDto.class);
+
+        } catch (RestClientException e) {
+            log.error("Error while fetching locations from Amadeus API", e);
+            AirportLocationResponseDto emptyResponse = new AirportLocationResponseDto();
+            emptyResponse.setData(Collections.emptyList());
+            return emptyResponse;
         }
     }
 
