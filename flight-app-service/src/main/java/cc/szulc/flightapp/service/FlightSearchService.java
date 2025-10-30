@@ -1,6 +1,7 @@
 package cc.szulc.flightapp.service;
 
 import cc.szulc.flightapp.client.AmadeusApiClient;
+import cc.szulc.flightapp.dto.AirportLocationResponseDto;
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
 import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.repository.SearchHistoryRepository;
@@ -39,6 +40,12 @@ public class FlightSearchService {
         searchHistoryRepository.save(historyEntry);
 
         return flightOffers;
+    }
+
+    @Cacheable("flightOffers")
+    public AirportLocationResponseDto searchAirports(String keyword) throws JsonProcessingException {
+        log.info("Wyszukiwanie lokalizacji dla słowa kluczowego: {}", keyword);
+        return amadeusApiClient.searchLocations(keyword);
     }
 
     public Page<SearchHistory> getSearchHistory(int page, int size) {

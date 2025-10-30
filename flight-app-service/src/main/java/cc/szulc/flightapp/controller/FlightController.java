@@ -1,9 +1,6 @@
 package cc.szulc.flightapp.controller;
 
-import cc.szulc.flightapp.dto.CreateFavoriteFlightRequestDto;
-import cc.szulc.flightapp.dto.FavoriteFlightDto;
-import cc.szulc.flightapp.dto.FlightOfferResponseDto;
-import cc.szulc.flightapp.dto.SearchHistoryDto;
+import cc.szulc.flightapp.dto.*;
 import cc.szulc.flightapp.entity.FavoriteFlight;
 import cc.szulc.flightapp.entity.SearchHistory;
 import cc.szulc.flightapp.service.FavoriteFlightService;
@@ -39,6 +36,13 @@ public class FlightController {
             @RequestParam @NotNull @Positive int adults
     ) throws JsonProcessingException {
         return flightSearchService.searchForFlights(originLocationCode, destinationLocationCode, departureDate, adults);
+    }
+
+    @GetMapping("/locations")
+    public AirportLocationResponseDto findLocations(
+            @RequestParam @NotBlank @Size(min = 1, max = 50) String keyword
+    ) throws JsonProcessingException {
+        return flightSearchService.searchAirports(keyword);
     }
 
     @GetMapping("/history")
