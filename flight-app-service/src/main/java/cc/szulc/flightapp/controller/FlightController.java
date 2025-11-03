@@ -14,6 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @RestController
 @RequestMapping("/api")
@@ -32,10 +35,12 @@ public class FlightController {
     public FlightOfferResponseDto findFlights(
             @RequestParam @NotBlank @Size(min = 3, max = 3) String originLocationCode,
             @RequestParam @NotBlank @Size(min = 3, max = 3) String destinationLocationCode,
-            @RequestParam @NotBlank String departureDate,
+            @RequestParam @NotNull @FutureOrPresent(message = "Departure date must be today or in the future")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
             @RequestParam @NotNull @Positive int adults
     ) throws JsonProcessingException {
-        return flightSearchService.searchForFlights(originLocationCode, destinationLocationCode, departureDate, adults);
+        String departureDateString = departureDate.toString();
+        return flightSearchService.searchForFlights(originLocationCode, destinationLocationCode, departureDateString, adults);
     }
 
     @GetMapping("/locations")
