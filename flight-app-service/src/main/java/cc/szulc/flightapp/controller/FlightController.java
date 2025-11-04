@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
@@ -59,10 +60,9 @@ public class FlightController {
         return historyPage.map(this::mapToDto);
     }
 
-
     @PostMapping("/favorites")
     @ResponseStatus(HttpStatus.CREATED)
-    public FavoriteFlightDto addFavorite(@RequestBody CreateFavoriteFlightRequestDto request) {
+    public FavoriteFlightDto addFavorite(@Valid @RequestBody CreateFavoriteFlightRequestDto request) {
         FavoriteFlight favoriteFlight = mapToEntity(request);
         FavoriteFlight savedFavorite = favoriteFlightService.addFavorite(favoriteFlight);
         return mapToDto(savedFavorite);
