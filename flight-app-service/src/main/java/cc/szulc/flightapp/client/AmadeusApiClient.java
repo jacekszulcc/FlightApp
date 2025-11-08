@@ -2,7 +2,7 @@ package cc.szulc.flightapp.client;
 
 import cc.szulc.flightapp.dto.AirportLocationResponseDto;
 import cc.szulc.flightapp.dto.FlightOfferResponseDto;
-import cc.szulc.flightapp.exception.AmadeusApiRequestException; // Importujemy nasz nowy wyjątek
+import cc.szulc.flightapp.exception.AmadeusApiRequestException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +11,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException; // Importujemy ogólny wyjątek RestTemplate
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
 import java.util.Map;
@@ -83,11 +85,19 @@ public class AmadeusApiClient {
             ResponseEntity<String> response = restTemplate.exchange(urlWithParams, HttpMethod.GET, entity, String.class);
             return objectMapper.readValue(response.getBody(), AirportLocationResponseDto.class);
 
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                log.warn("Amadeus API returned 404 Not Found for keyword: {}", keyword);
+                AirportLocationResponseDto emptyResponse = new AirportLocationResponseDto();
+                emptyResponse.setData(Collections.emptyList());
+                return emptyResponse;
+            } else {
+                log.error("Error while fetching locations (HttpClientErrorException): {}", e.getMessage());
+                throw new AmadeusApiRequestException("Failed to fetch locations from Amadeus API.", e);
+            }
         } catch (RestClientException e) {
-            log.error("Error while fetching locations from Amadeus API", e);
-            AirportLocationResponseDto emptyResponse = new AirportLocationResponseDto();
-            emptyResponse.setData(Collections.emptyList());
-            return emptyResponse;
+            log.error("Error while fetching locations from Amadeus API (RestClientException)", e);
+            throw new AmadeusApiRequestException("Failed to fetch locations from Amadeus API.", e);
         }
     }
 
