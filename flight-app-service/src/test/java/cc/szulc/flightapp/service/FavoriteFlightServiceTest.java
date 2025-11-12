@@ -1,7 +1,10 @@
 package cc.szulc.flightapp.service;
 
 import cc.szulc.flightapp.entity.FavoriteFlight;
+import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.repository.FavoriteFlightRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -12,9 +15,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,8 +36,38 @@ class FavoriteFlightServiceTest {
     @InjectMocks
     private FavoriteFlightService favoriteFlightService;
 
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
+
+    private User mockUser;
+
+    @BeforeEach
+    void setUp() {
+        mockUser = new User();
+        mockUser.setId(1L);
+        mockUser.setUsername("testUser");
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+    private void mockAuthenticatedUser() {
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authentication.getPrincipal()).thenReturn(mockUser);
+    }
+
     @Test
     void addFavorite_shouldSetAddedAtAndSaveFlight() {
+        mockAuthenticatedUser();
+
         FavoriteFlight flight = new FavoriteFlight();
         flight.setOrigin("WAW");
         flight.setDestination("JFK");
@@ -43,15 +80,16 @@ class FavoriteFlightServiceTest {
         verify(favoriteFlightRepository, times(1)).save(flightCaptor.capture());
 
         assertThat(flightCaptor.getValue().getAddedAt()).isNotNull();
+        assertThat(flightCaptor.getValue().getUser()).isEqualTo(mockUser);
 
         assertThat(savedFlight).isNotNull();
-        assertThat(savedFlight.getAddedAt()).isNotNull();
         assertThat(savedFlight.getOrigin()).isEqualTo("WAW");
     }
 
     @Test
     void getAllFavorites_shouldReturnPageOfFlights() {
-        // Given
+        mockAuthenticatedUser();
+
         int page = 0;
         int size = 10;
         Pageable expectedPageable = PageRequest.of(page, size);
@@ -61,11 +99,11 @@ class FavoriteFlightServiceTest {
         List<FavoriteFlight> flights = Collections.singletonList(flight);
         Page<FavoriteFlight> flightPage = new PageImpl<>(flights, expectedPageable, flights.size());
 
-        when(favoriteFlightRepository.findAll(expectedPageable)).thenReturn(flightPage);
+        when(favoriteFlightRepository.findAllByUser(mockUser, expectedPageable)).thenReturn(flightPage);
 
         Page<FavoriteFlight> result = favoriteFlightService.getAllFavorites(page, size);
 
-        verify(favoriteFlightRepository, times(1)).findAll(expectedPageable);
+        verify(favoriteFlightRepository, times(1)).findAllByUser(mockUser, expectedPageable);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -74,12 +112,16 @@ class FavoriteFlightServiceTest {
 
     @Test
     void deleteFavorite_shouldCallDeleteById() {
+        mockAuthenticatedUser();
         Long flightId = 123L;
+        FavoriteFlight flight = new FavoriteFlight();
+        flight.setId(flightId);
+        flight.setUser(mockUser);
 
-        doNothing().when(favoriteFlightRepository).deleteById(flightId);
+        when(favoriteFlightRepository.findByIdAndUser(flightId, mockUser)).thenReturn(Optional.of(flight));
 
         favoriteFlightService.deleteFavorite(flightId);
-        
+
         verify(favoriteFlightRepository, times(1)).deleteById(flightId);
     }
 }

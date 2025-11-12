@@ -1,15 +1,21 @@
 package cc.szulc.flightapp.controller;
 
 import cc.szulc.flightapp.dto.CreateFavoriteFlightRequestDto;
+import cc.szulc.flightapp.entity.Role;
+import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.repository.FavoriteFlightRepository;
+import cc.szulc.flightapp.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -30,15 +36,39 @@ public class FavoriteFlightIntegrationTest {
     private FavoriteFlightRepository favoriteFlightRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ObjectMapper objectMapper;
+
+    private static final String TEST_USERNAME = "testuser";
+
+    @BeforeEach
+    void setup() {
+        SecurityContextHolder.clearContext();
+
+        User user = new User();
+        user.setUsername(TEST_USERNAME);
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setRole(Role.ROLE_USER);
+        User savedUser = userRepository.save(user);
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(savedUser, null, savedUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 
     @AfterEach
     void cleanup() {
         favoriteFlightRepository.deleteAll();
+        userRepository.deleteAll();
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    @WithMockUser
     void shouldAddAndRetrieveFavoriteFlight() throws Exception {
         CreateFavoriteFlightRequestDto requestDto = new CreateFavoriteFlightRequestDto();
         requestDto.setOrigin("GDN");

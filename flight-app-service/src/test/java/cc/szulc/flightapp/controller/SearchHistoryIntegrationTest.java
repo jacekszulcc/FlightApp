@@ -1,13 +1,19 @@
 package cc.szulc.flightapp.controller;
 
+import cc.szulc.flightapp.entity.Role;
 import cc.szulc.flightapp.entity.SearchHistory;
+import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.repository.SearchHistoryRepository;
+import cc.szulc.flightapp.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -26,20 +32,47 @@ public class SearchHistoryIntegrationTest {
     @Autowired
     private SearchHistoryRepository searchHistoryRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private static final String TEST_USERNAME = "historyUser";
+
     @BeforeEach
+    void setup() {
+        SecurityContextHolder.clearContext();
+
+        User user = new User();
+        user.setUsername(TEST_USERNAME);
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setRole(Role.ROLE_USER);
+        User savedUser = userRepository.save(user);
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(savedUser, null, savedUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    @AfterEach
     void cleanup() {
         searchHistoryRepository.deleteAll();
+        userRepository.deleteAll();
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    @WithMockUser
     void shouldReturnSavedSearchHistory() throws Exception {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         SearchHistory testEntry = new SearchHistory();
         testEntry.setOriginLocationCode("WAW");
         testEntry.setDestinationLocationCode("JFK");
         testEntry.setDepartureDate("2025-12-01");
         testEntry.setAdults(2);
         testEntry.setSearchTimestamp(LocalDateTime.now());
+        testEntry.setUser(currentUser);
         searchHistoryRepository.save(testEntry);
 
         mockMvc.perform(get("/api/history"))
