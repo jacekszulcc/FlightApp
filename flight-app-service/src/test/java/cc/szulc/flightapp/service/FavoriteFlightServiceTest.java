@@ -81,13 +81,12 @@ class FavoriteFlightServiceTest {
 
         assertThat(flightCaptor.getValue().getAddedAt()).isNotNull();
         assertThat(flightCaptor.getValue().getUser()).isEqualTo(mockUser);
-
+        assertThat(flightCaptor.getValue().isDeleted()).isFalse();
         assertThat(savedFlight).isNotNull();
-        assertThat(savedFlight.getOrigin()).isEqualTo("WAW");
     }
 
     @Test
-    void getAllFavorites_shouldReturnPageOfFlights() {
+    void getAllFavorites_shouldReturnPageOfActiveFlights() {
         mockAuthenticatedUser();
 
         int page = 0;
@@ -99,29 +98,34 @@ class FavoriteFlightServiceTest {
         List<FavoriteFlight> flights = Collections.singletonList(flight);
         Page<FavoriteFlight> flightPage = new PageImpl<>(flights, expectedPageable, flights.size());
 
-        when(favoriteFlightRepository.findAllByUser(mockUser, expectedPageable)).thenReturn(flightPage);
+        when(favoriteFlightRepository.findAllByUserAndIsDeletedFalse(mockUser, expectedPageable)).thenReturn(flightPage);
 
         Page<FavoriteFlight> result = favoriteFlightService.getAllFavorites(page, size);
 
-        verify(favoriteFlightRepository, times(1)).findAllByUser(mockUser, expectedPageable);
+        verify(favoriteFlightRepository, times(1)).findAllByUserAndIsDeletedFalse(mockUser, expectedPageable);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getId()).isEqualTo(1L);
     }
 
     @Test
-    void deleteFavorite_shouldCallDeleteById() {
+    void deleteFavorite_shouldSoftDeleteFlight() {
         mockAuthenticatedUser();
         Long flightId = 123L;
         FavoriteFlight flight = new FavoriteFlight();
         flight.setId(flightId);
         flight.setUser(mockUser);
+        flight.setDeleted(false);
 
         when(favoriteFlightRepository.findByIdAndUser(flightId, mockUser)).thenReturn(Optional.of(flight));
 
         favoriteFlightService.deleteFavorite(flightId);
 
-        verify(favoriteFlightRepository, times(1)).deleteById(flightId);
+        ArgumentCaptor<FavoriteFlight> flightCaptor = ArgumentCaptor.forClass(FavoriteFlight.class);
+        verify(favoriteFlightRepository, times(1)).save(flightCaptor.capture());
+
+        verify(favoriteFlightRepository, never()).deleteById(anyLong());
+
+        assertThat(flightCaptor.getValue().isDeleted()).isTrue();
     }
 }

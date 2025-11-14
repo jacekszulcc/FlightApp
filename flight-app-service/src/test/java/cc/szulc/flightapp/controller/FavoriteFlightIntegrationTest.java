@@ -1,6 +1,7 @@
 package cc.szulc.flightapp.controller;
 
 import cc.szulc.flightapp.dto.CreateFavoriteFlightRequestDto;
+import cc.szulc.flightapp.entity.FavoriteFlight;
 import cc.szulc.flightapp.entity.Role;
 import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.repository.FavoriteFlightRepository;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -69,7 +71,7 @@ public class FavoriteFlightIntegrationTest {
     }
 
     @Test
-    void shouldAddAndRetrieveFavoriteFlight() throws Exception {
+    void shouldAddAndSoftDeleteFavoriteFlight() throws Exception {
         CreateFavoriteFlightRequestDto requestDto = new CreateFavoriteFlightRequestDto();
         requestDto.setOrigin("GDN");
         requestDto.setDestination("KRK");
@@ -94,6 +96,12 @@ public class FavoriteFlightIntegrationTest {
         mockMvc.perform(delete("/api/favorites/" + favoriteId))
                 .andExpect(status().isNoContent());
 
-        assertThat(favoriteFlightRepository.findById(favoriteId)).isEmpty();
+        Optional<FavoriteFlight> deletedFlightOptional = favoriteFlightRepository.findById(favoriteId);
+        assertThat(deletedFlightOptional).isPresent();
+        assertThat(deletedFlightOptional.get().isDeleted()).isTrue();
+
+        mockMvc.perform(get("/api/favorites"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(0));
     }
 }

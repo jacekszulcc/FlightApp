@@ -24,21 +24,24 @@ public class FavoriteFlightService {
         User currentUser = getCurrentUser();
         favoriteFlight.setUser(currentUser);
         favoriteFlight.setAddedAt(LocalDateTime.now());
+        favoriteFlight.setDeleted(false);
         return favoriteFlightRepository.save(favoriteFlight);
     }
 
     public Page<FavoriteFlight> getAllFavorites(int page, int size) {
         User currentUser = getCurrentUser();
         Pageable pageable = PageRequest.of(page, size);
-        return favoriteFlightRepository.findAllByUser(currentUser, pageable);
+        return favoriteFlightRepository.findAllByUserAndIsDeletedFalse(currentUser, pageable);
     }
 
     public void deleteFavorite(Long id) {
         User currentUser = getCurrentUser();
+
         FavoriteFlight flight = favoriteFlightRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono ulubionego lotu o ID: " + id + " lub nie należy on do Ciebie."));
 
-        favoriteFlightRepository.deleteById(flight.getId());
+        flight.setDeleted(true);
+        favoriteFlightRepository.save(flight);
     }
 
     private User getCurrentUser() {

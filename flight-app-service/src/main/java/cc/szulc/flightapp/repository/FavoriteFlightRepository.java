@@ -11,7 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface FavoriteFlightRepository extends JpaRepository<FavoriteFlight, Long> {
-    Page<FavoriteFlight> findAllByUser(User user, Pageable pageable);
+
+    Page<FavoriteFlight> findAllByUserAndIsDeletedFalse(User user, Pageable pageable);
 
     Optional<FavoriteFlight> findByIdAndUser(Long id, User user);
 }
