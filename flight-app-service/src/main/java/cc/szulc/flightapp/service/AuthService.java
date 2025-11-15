@@ -3,6 +3,7 @@ package cc.szulc.flightapp.service;
 import cc.szulc.flightapp.dto.AuthRequestDto;
 import cc.szulc.flightapp.dto.AuthResponseDto;
 import cc.szulc.flightapp.dto.ChangePasswordRequestDto;
+import cc.szulc.flightapp.dto.UserDto;
 import cc.szulc.flightapp.entity.Role;
 import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.exception.UserAlreadyExistsException;
@@ -13,6 +14,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +65,19 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::mapToUserDto)
+                .collect(Collectors.toList());
+    }
+
+    private UserDto mapToUserDto(User user) {
+        return new UserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getRole()
+        );
     }
 }
