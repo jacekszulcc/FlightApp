@@ -6,26 +6,28 @@ This project was developed to demonstrate key skills for a Junior Java Developer
 
 ## Key Features
 
-* REST API for searching flights, airport locations, search history, and managing favorite flights.
-* Full authentication and authorization based on roles (USER, ADMIN) using JWT.
-* Maven multi-module architecture (`flight-app-db`, `flight-app-service`).
-* Integration with the external Amadeus API (OAuth2) to fetch offers and locations.
-* Database migration management using Flyway.
-* Global exception handling for consistent error responses.
-* Automatic creation of an administrator account on application startup.
-* Unit test coverage for the service layer (JUnit 5, Mockito).
-* Fully containerized runtime environment using Docker and Docker Compose.
-* CI/CD pipeline using GitHub Actions.
-* Automatically generated API documentation (Swagger/OpenAPI).
+* **REST API** for searching flights, airport locations, search history, and managing favorite flights.
+* **Full Authentication & Authorization** based on roles (USER, ADMIN) using JWT.
+* **Admin Panel:** Dedicated endpoints for administrators to view registered users.
+* **Maven Multi-Module Architecture** (`flight-app-db`, `flight-app-service`).
+* **Amadeus API Integration** (OAuth2) to fetch real-time flight offers and locations.
+* **Database Migrations** managed by Flyway.
+* **Soft Delete:** Favorite flights are not physically removed from the database but marked as deleted to preserve data integrity.
+* **Global Exception Handling** for consistent error responses.
+* **Automatic Admin Account** creation on application startup.
+* **Unit & Integration Testing** coverage (JUnit 5, Mockito, Spring Boot Test).
+* **Containerization:** Fully configured runtime environment using Docker and Docker Compose.
+* **CI/CD:** Automated build and test pipeline using GitHub Actions.
+* **API Documentation:** Automatically generated via Swagger/OpenAPI.
 
 ## Technology Stack
 
-* **Backend**: Java 17, Spring Boot 3, Spring Web, Spring Data JPA, Spring Security, Maven
-* **Database**: PostgreSQL, Flyway
-* **Testing**: JUnit 5, Mockito, AssertJ
-* **Security**: JWT (jjwt)
-* **DevOps**: Git, GitHub, Docker, Docker Compose, GitHub Actions
-* **Other**: Lombok, Caffeine (Cache), Springdoc-OpenAPI
+* **Backend:** Java 17, Spring Boot 3, Spring Web, Spring Data JPA, Spring Security, Maven
+* **Database:** PostgreSQL, Flyway
+* **Testing:** JUnit 5, Mockito, AssertJ
+* **Security:** JWT (jjwt)
+* **DevOps:** Git, GitHub, Docker, Docker Compose, GitHub Actions
+* **Other:** Lombok, Caffeine (Cache), Springdoc-OpenAPI
 
 ## How to Run Locally
 
@@ -86,7 +88,8 @@ This project was developed to demonstrate key skills for a Junior Java Developer
     * **Query Parameters:**
         * `keyword` (String, e.g., `Warsaw` or `JFK`)
 
-### History and Favorites (Requires USER or ADMIN Role)
+### History and Favorites (User Context)
+*These endpoints return data specific to the currently authenticated user.*
 
 * **Get Search History (paginated):**
     * **URL:** `/api/history`
@@ -107,6 +110,16 @@ This project was developed to demonstrate key skills for a Junior Java Developer
     * **Method:** `POST`
     * **Body (JSON):** `CreateFavoriteFlightRequestDto`
 
-* **Delete from Favorites:**
+* **Delete from Favorites (Soft Delete):**
     * **URL:** `/api/favorites/{id}`
     * **Method:** `DELETE`
+
+### Admin Management (Requires ADMIN Role)
+
+* **Get All Users (paginated):**
+    * **URL:** `/api/admin/users`
+    * **Method:** `GET`
+    * **Query Parameters:**
+        * `page` (int, default: `0`)
+        * `size` (int, default: `20`)
+    * **Response:** Returns a paginated list of users (safe DTOs without passwords).
