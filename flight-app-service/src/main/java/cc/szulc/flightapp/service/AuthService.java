@@ -9,6 +9,7 @@ import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.exception.UserAlreadyExistsException;
 import cc.szulc.flightapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict; // Import
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,12 +47,15 @@ public class AuthService {
         return new AuthResponseDto(jwtService.generateToken(user));
     }
 
+    @CacheEvict(value = "users", key = "#username")
     public void changePassword(ChangePasswordRequestDto request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("Authenticated user not found in database"));
+
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new BadCredentialsException("Invalid old password");
         }
+
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
