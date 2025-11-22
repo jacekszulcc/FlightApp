@@ -32,6 +32,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false)
+    private boolean isEnabled = true;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -49,16 +52,34 @@ public class User implements UserDetails {
         }
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+
     @Override
-    public String getPassword() { return this.password; }
+    public String getPassword() {
+        return this.password;
+    }
+
     @Override
-    public String getUsername() { return this.username; }
+    public String getUsername() {
+        return this.username;
+    }
+
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
     @Override
-    public boolean isEnabled() { return true; }
+    public boolean isEnabled() {
+        return this.isEnabled;
+    }
 }
