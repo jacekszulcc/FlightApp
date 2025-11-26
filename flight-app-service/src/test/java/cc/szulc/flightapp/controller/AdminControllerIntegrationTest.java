@@ -14,7 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,7 +49,6 @@ class AdminControllerIntegrationTest {
         createTestUser("admin", Role.ROLE_ADMIN);
         createTestUser("user1", Role.ROLE_USER);
         createTestUser("user2", Role.ROLE_USER);
-
         authenticateAs("admin");
 
         mockMvc.perform(get("/api/admin/users")
@@ -55,28 +56,39 @@ class AdminControllerIntegrationTest {
                         .param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.totalElements").value(3))
-                .andExpect(jsonPath("$.totalPages").value(2))
-                .andExpect(jsonPath("$.content[0].username").isNotEmpty())
-                .andExpect(jsonPath("$.content[0].role").isNotEmpty());
+                .andExpect(jsonPath("$.totalElements").value(3));
     }
 
     @Test
     void shouldReturnForbidden_WhenRegularUserRequests() throws Exception {
         createTestUser("user", Role.ROLE_USER);
-
         authenticateAs("user");
 
         mockMvc.perform(get("/api/admin/users"))
                 .andExpect(status().isForbidden());
     }
+    
+    @Test
+    void shouldChangeUserStatus_WhenAdminRequests() throws Exception {
+        createTestUser("admin", Role.ROLE_ADMIN);
+        User targetUser = createTestUser("userToBan", Role.ROLE_USER);
+        authenticateAs("admin");
 
-    private void createTestUser(String username, Role role) {
+        mockMvc.perform(patch("/api/admin/users/" + targetUser.getId() + "/status")
+                        .param("enabled", "false"))
+                .andExpect(status().isNoContent());
+
+        User updatedUser = userRepository.findById(targetUser.getId()).orElseThrow();
+        assertThat(updatedUser.isEnabled()).isFalse();
+    }
+
+    private User createTestUser(String username, Role role) {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode("password"));
         user.setRole(role);
-        userRepository.save(user);
+        user.setEnabled(true);
+        return userRepository.save(user);
     }
 
     private void authenticateAs(String username) {

@@ -9,7 +9,8 @@ import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.exception.UserAlreadyExistsException;
 import cc.szulc.flightapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict; // Import
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final CacheManager cacheManager;
 
     public void register(AuthRequestDto authRequest) {
         if (userRepository.findByUsername(authRequest.getUsername()).isPresent()) {
@@ -71,5 +75,15 @@ public class AuthService {
                 user.getUsername(),
                 user.getRole()
         );
+    }
+
+    public void changeUserStatus(Long userId, boolean isEnabled) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found"));
+
+        user.setEnabled(isEnabled);
+        userRepository.save(user);
+
+        Objects.requireNonNull(cacheManager.getCache("users")).evict(user.getUsername());
     }
 }
