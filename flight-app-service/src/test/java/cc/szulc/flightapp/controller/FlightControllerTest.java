@@ -12,6 +12,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,13 +38,15 @@ class FlightControllerTest {
     void shouldReturnFlightWhenCorrectParametersAreProvided() throws Exception{
         FlightOfferResponseDto testResponse = new FlightOfferResponseDto();
 
+        String futureDate = LocalDate.now().plusDays(1).toString();
+
         when(flightSearchService.searchForFlights(anyString(), anyString(), anyString(), anyInt()))
                 .thenReturn(testResponse);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/flights")
                         .param("originLocationCode", "MAD")
                         .param("destinationLocationCode", "JFK")
-                        .param("departureDate", "2025-11-25")
+                        .param("departureDate", futureDate) // Użycie zmiennej
                         .param("adults", "1"))
                 .andExpect(status().isOk())
                 .andReturn();

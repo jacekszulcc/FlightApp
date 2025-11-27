@@ -67,7 +67,7 @@ class AdminControllerIntegrationTest {
         mockMvc.perform(get("/api/admin/users"))
                 .andExpect(status().isForbidden());
     }
-    
+
     @Test
     void shouldChangeUserStatus_WhenAdminRequests() throws Exception {
         createTestUser("admin", Role.ROLE_ADMIN);
