@@ -1,6 +1,8 @@
 package cc.szulc.flightapp.controller;
 
 import cc.szulc.flightapp.config.security.SecurityConfig;
+import cc.szulc.flightapp.exception.CustomAccessDeniedHandler;
+import cc.szulc.flightapp.exception.CustomAuthenticationEntryPoint;
 import cc.szulc.flightapp.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder; // <-- DODAJ IMPORT
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -31,6 +33,12 @@ class HealthCheckControllerTest {
 
     @MockBean
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private CustomAccessDeniedHandler accessDeniedHandler;
+
+    @MockBean
+    private CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Test
     @WithMockUser
