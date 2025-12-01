@@ -4,11 +4,14 @@ import cc.szulc.flightapp.dto.AuthRequestDto;
 import cc.szulc.flightapp.dto.AuthResponseDto;
 import cc.szulc.flightapp.dto.ChangePasswordRequestDto;
 import cc.szulc.flightapp.dto.UserDto;
+import cc.szulc.flightapp.entity.RefreshToken;
 import cc.szulc.flightapp.entity.Role;
 import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.exception.UserAlreadyExistsException;
+import cc.szulc.flightapp.repository.RefreshTokenRepository;
 import cc.szulc.flightapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -18,8 +21,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +36,10 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CacheManager cacheManager;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    @Value("${jwt.refresh.expiration}")
+    private Long refreshTokenDurationMs;
 
     public void register(AuthRequestDto authRequest) {
         if (userRepository.findByUsername(authRequest.getUsername()).isPresent()) {
@@ -39,6 +49,7 @@ public class AuthService {
         newUser.setUsername(authRequest.getUsername());
         newUser.setPassword(passwordEncoder.encode(authRequest.getPassword()));
         newUser.setRole(Role.ROLE_USER);
+        newUser.setEnabled(true);
         userRepository.save(newUser);
     }
 
@@ -48,7 +59,27 @@ public class AuthService {
         );
         User user = userRepository.findByUsername(authRequest.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
-        return new AuthResponseDto(jwtService.generateToken(user));
+
+        String accessToken = jwtService.generateToken(user);
+
+        RefreshToken refreshToken = createRefreshToken(user.getUsername());
+
+        return new AuthResponseDto(accessToken, refreshToken.getToken());
+    }
+
+    @Transactional
+    public RefreshToken createRefreshToken(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        refreshTokenRepository.deleteByUser(user);
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
+        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        refreshToken.setToken(UUID.randomUUID().toString());
+
+        return refreshTokenRepository.save(refreshToken);
     }
 
     @CacheEvict(value = "users", key = "#username")
@@ -83,7 +114,6 @@ public class AuthService {
 
         user.setEnabled(isEnabled);
         userRepository.save(user);
-
         Objects.requireNonNull(cacheManager.getCache("users")).evict(user.getUsername());
     }
 }

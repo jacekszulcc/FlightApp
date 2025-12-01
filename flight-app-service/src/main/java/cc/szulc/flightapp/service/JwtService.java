@@ -21,6 +21,8 @@ public class JwtService {
     @Value("${jwt.secret.key}")
     private String secretKey;
 
+    private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60 * 24;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -61,7 +63,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

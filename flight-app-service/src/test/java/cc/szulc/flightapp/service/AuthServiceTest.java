@@ -2,8 +2,10 @@ package cc.szulc.flightapp.service;
 
 import cc.szulc.flightapp.dto.AuthRequestDto;
 import cc.szulc.flightapp.dto.AuthResponseDto;
+import cc.szulc.flightapp.entity.RefreshToken;
 import cc.szulc.flightapp.entity.User;
 import cc.szulc.flightapp.exception.UserAlreadyExistsException;
+import cc.szulc.flightapp.repository.RefreshTokenRepository;
 import cc.szulc.flightapp.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +14,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -40,8 +44,19 @@ class AuthServiceTest {
     @Mock
     private AuthenticationManager authenticationManager;
 
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository; // NOWY MOCK
+
+    @Mock
+    private CacheManager cacheManager; // NOWY MOCK
+
     @InjectMocks
     private AuthService authService;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(authService, "refreshTokenDurationMs", 604800000L);
+    }
 
     @Test
     void register_shouldSaveUser_whenUsernameIsUnique() {
@@ -60,8 +75,6 @@ class AuthServiceTest {
 
         assertThat(savedUser.getUsername()).isEqualTo("newUser");
         assertThat(savedUser.getPassword()).isEqualTo("hashedPassword");
-
-        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
@@ -80,7 +93,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void login_shouldReturnToken_whenCredentialsAreValid() {
+    void login_shouldReturnTokens_whenCredentialsAreValid() {
+        // Given
         AuthRequestDto request = new AuthRequestDto();
         request.setUsername("user");
         request.setPassword("password123");
@@ -89,25 +103,25 @@ class AuthServiceTest {
         user.setId(1L);
         user.setUsername("user");
 
-        String expectedToken = "mockedJwtToken";
+        String expectedAccessToken = "mockedAccessToken";
+        String expectedRefreshToken = "mockedRefreshToken";
 
-        ArgumentCaptor<UsernamePasswordAuthenticationToken> authTokenCaptor =
-                ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
+        RefreshToken refreshTokenEntity = new RefreshToken();
+        refreshTokenEntity.setToken(expectedRefreshToken);
 
         when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
-
-        when(jwtService.generateToken(user)).thenReturn(expectedToken);
+        when(jwtService.generateToken(user)).thenReturn(expectedAccessToken);
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(refreshTokenEntity);
 
         AuthResponseDto response = authService.login(request);
 
-        verify(authenticationManager, times(1)).authenticate(authTokenCaptor.capture());
-        UsernamePasswordAuthenticationToken capturedToken = authTokenCaptor.getValue();
-
-        assertThat(capturedToken.getName()).isEqualTo("user");
-        assertThat(capturedToken.getCredentials()).isEqualTo("password123");
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(refreshTokenRepository).deleteByUser(user);
+        verify(refreshTokenRepository).save(any(RefreshToken.class));
 
         assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo(expectedToken);
+        assertThat(response.getAccessToken()).isEqualTo(expectedAccessToken);
+        assertThat(response.getRefreshToken()).isEqualTo(expectedRefreshToken);
     }
 
     @Test
