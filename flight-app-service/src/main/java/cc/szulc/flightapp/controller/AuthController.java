@@ -2,6 +2,7 @@ package cc.szulc.flightapp.controller;
 
 import cc.szulc.flightapp.dto.AuthRequestDto;
 import cc.szulc.flightapp.dto.AuthResponseDto;
+import cc.szulc.flightapp.dto.RefreshTokenRequestDto;
 import cc.szulc.flightapp.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +33,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> loginUser(@RequestBody AuthRequestDto authRequest) {
         return ResponseEntity.ok(authService.login(authRequest));
+    }
+
+    @PostMapping("/refresh")
+    public AuthResponseDto refreshToken(@Valid @RequestBody RefreshTokenRequestDto request) {
+        return authService.refreshToken(request);
     }
 }

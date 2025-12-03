@@ -1,12 +1,10 @@
 package cc.szulc.flightapp.service;
 
-import cc.szulc.flightapp.dto.AuthRequestDto;
-import cc.szulc.flightapp.dto.AuthResponseDto;
-import cc.szulc.flightapp.dto.ChangePasswordRequestDto;
-import cc.szulc.flightapp.dto.UserDto;
+import cc.szulc.flightapp.dto.*;
 import cc.szulc.flightapp.entity.RefreshToken;
 import cc.szulc.flightapp.entity.Role;
 import cc.szulc.flightapp.entity.User;
+import cc.szulc.flightapp.exception.TokenRefreshException;
 import cc.szulc.flightapp.exception.UserAlreadyExistsException;
 import cc.szulc.flightapp.repository.RefreshTokenRepository;
 import cc.szulc.flightapp.repository.UserRepository;
@@ -115,5 +113,26 @@ public class AuthService {
         user.setEnabled(isEnabled);
         userRepository.save(user);
         Objects.requireNonNull(cacheManager.getCache("users")).evict(user.getUsername());
+    }
+
+    public AuthResponseDto refreshToken(RefreshTokenRequestDto request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        return refreshTokenRepository.findByToken(requestRefreshToken)
+                .map(this::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String accessToken = jwtService.generateToken(user);
+                    return new AuthResponseDto(accessToken, requestRefreshToken);
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+    }
+
+    private RefreshToken verifyExpiration(RefreshToken token) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            refreshTokenRepository.delete(token);
+            throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
+        }
+        return token;
     }
 }
