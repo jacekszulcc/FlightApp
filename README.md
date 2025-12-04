@@ -8,10 +8,12 @@ This project was developed to demonstrate key skills for a Junior Java Developer
 
 * **REST API** for searching flights, airport locations, search history, and managing favorite flights.
 * **Full Authentication & Authorization** based on roles (USER, ADMIN) using JWT.
-* **Admin Panel:** Dedicated endpoints for administrators to view registered users.
+* **Secure Token Management:** Implemented Access Token and Refresh Token mechanism for secure, long-term sessions.
+* **Admin Panel:** Dedicated endpoints for administrators to view and manage registered users.
 * **Maven Multi-Module Architecture** (`flight-app-db`, `flight-app-service`).
 * **Amadeus API Integration** (OAuth2) to fetch real-time flight offers and locations.
 * **Database Migrations** managed by Flyway.
+* **Caching:** In-memory caching (Caffeine) for optimized user data retrieval.
 * **Soft Delete:** Favorite flights are not physically removed from the database but marked as deleted to preserve data integrity.
 * **Global Exception Handling** for consistent error responses.
 * **Automatic Admin Account** creation on application startup.
@@ -56,7 +58,7 @@ This project was developed to demonstrate key skills for a Junior Java Developer
 
 ## API Endpoints
 
-**Note:** All `/api/**` endpoints require authentication. You must send a valid JWT in the request header: `Authorization: Bearer <YOUR_TOKEN>`.
+**Note:** All `/api/**` endpoints require authentication. You must send a valid access token in the request header: `Authorization: Bearer <YOUR_ACCESS_TOKEN>`.
 
 ### Authorization (Public)
 
@@ -69,7 +71,13 @@ This project was developed to demonstrate key skills for a Junior Java Developer
     * **URL:** `/auth/login`
     * **Method:** `POST`
     * **Body (JSON):** `{"username": "user", "password": "password123"}`
-    * **Success Response:** `{"token": "eyJhbGciOi..."}`
+    * **Success Response:** `{"accessToken": "ey...", "refreshToken": "uuid..."}`
+
+* **Refresh Token:**
+    * **URL:** `/auth/refresh`
+    * **Method:** `POST`
+    * **Body (JSON):** `{"refreshToken": "your-refresh-token-uuid"}`
+    * **Success Response:** `{"accessToken": "ey...", "refreshToken": "your-refresh-token-uuid"}`
 
 ### Search (Requires USER or ADMIN Role)
 
@@ -123,3 +131,9 @@ This project was developed to demonstrate key skills for a Junior Java Developer
         * `page` (int, default: `0`)
         * `size` (int, default: `20`)
     * **Response:** Returns a paginated list of users (safe DTOs without passwords).
+
+* **Change User Status (Block/Unblock):**
+    * **URL:** `/api/admin/users/{id}/status`
+    * **Method:** `PATCH`
+    * **Query Parameters:**
+        * `enabled` (boolean, e.g., `true` or `false`)
