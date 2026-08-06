@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,15 +35,20 @@ class AdminControllerIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     @BeforeEach
     void setup() {
         userRepository.deleteAll();
+        clearUserCache();
     }
 
     @AfterEach
     void cleanup() {
         SecurityContextHolder.clearContext();
         userRepository.deleteAll();
+        clearUserCache();
     }
 
     @Test
@@ -89,6 +96,15 @@ class AdminControllerIntegrationTest {
         user.setRole(role);
         user.setEnabled(true);
         return userRepository.save(user);
+    }
+
+    // These tests change the users table directly, which the "users" cache does
+    // not observe, so it is cleared alongside every reset of the table.
+    private void clearUserCache() {
+        Cache users = cacheManager.getCache("users");
+        if (users != null) {
+            users.clear();
+        }
     }
 
     private void authenticateAs(String username) {
