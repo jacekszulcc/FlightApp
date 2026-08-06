@@ -2,7 +2,7 @@
 
 FlightApp is a backend application for a flight search engine, built with Java 17 and Spring Boot 3. It integrates with the Amadeus API to provide flight offers, saves search history and favorite flights to a PostgreSQL database, and exposes data through a REST API secured with JWT.
 
-This project was developed to demonstrate key skills for a Junior Java Developer role, including API development, multi-module architecture, database management (Flyway), security implementation (Spring Security, JWT), and containerization (Docker).
+The project was built as a working example of system integration and data processing: it connects to an external provider (Amadeus) over REST using OAuth2 client credentials, fetches flight and location data from that system, and persists search history and user-selected records in PostgreSQL. The database schema is managed through versioned Flyway migrations, access to the data is controlled by Spring Security with JWT, the whole runtime environment is containerized with Docker Compose, and every change is verified by an automated build and test pipeline in GitHub Actions.
 
 ## Key Features
 
@@ -41,7 +41,7 @@ This project was developed to demonstrate key skills for a Junior Java Developer
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/jacekszulcc/FlightApp.git](https://github.com/jacekszulcc/FlightApp.git)
+    git clone https://github.com/jacekszulcc/FlightApp.git
     cd FlightApp
     ```
 
@@ -137,3 +137,7 @@ This project was developed to demonstrate key skills for a Junior Java Developer
     * **Method:** `PATCH`
     * **Query Parameters:**
         * `enabled` (boolean, e.g., `true` or `false`)
+
+## Status
+
+This project is finished and is no longer being developed. The last change to the code was made in December 2025. It was built as a complete, runnable example of integrating an external REST API with a persistence layer and a containerized deployment, and it is kept here in that state as a reference.
